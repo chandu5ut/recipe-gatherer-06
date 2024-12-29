@@ -1,11 +1,24 @@
 import { Recipe } from "@/types/recipe";
 
-const API_KEY = "1234567890"; // Replace with actual API key
 const API_URL = "https://api.spoonacular.com/recipes/findByIngredients";
 
+const getApiKey = () => {
+  return localStorage.getItem("spoonacular_api_key");
+};
+
+export const setApiKey = (key: string) => {
+  localStorage.setItem("spoonacular_api_key", key);
+};
+
 export const searchRecipes = async (ingredients: string[]): Promise<Recipe[]> => {
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    throw new Error("API key not found. Please set your Spoonacular API key first.");
+  }
+
   const params = new URLSearchParams({
-    apiKey: API_KEY,
+    apiKey,
     ingredients: ingredients.join(","),
     number: "12",
     ranking: "2",

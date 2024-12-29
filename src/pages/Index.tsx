@@ -1,14 +1,27 @@
 import { useState } from "react";
 import { IngredientInput } from "@/components/IngredientInput";
 import { RecipeCard } from "@/components/RecipeCard";
-import { searchRecipes } from "@/services/recipeService";
+import { searchRecipes, setApiKey } from "@/services/recipeService";
 import { Recipe } from "@/types/recipe";
 import { useToast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
+  const [apiKey, setApiKeyState] = useState("");
   const { toast } = useToast();
+
+  const handleApiKeySubmit = () => {
+    if (apiKey.trim()) {
+      setApiKey(apiKey.trim());
+      toast({
+        title: "Success",
+        description: "API key has been saved",
+      });
+    }
+  };
 
   const handleSearch = async (ingredients: string[]) => {
     setLoading(true);
@@ -18,7 +31,7 @@ const Index = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch recipes. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to fetch recipes",
         variant: "destructive",
       });
     } finally {
@@ -33,6 +46,30 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-recipe-neutral">Recipe Finder</h1>
           <p className="text-muted-foreground">
             Enter your ingredients and discover delicious recipes you can make
+          </p>
+        </div>
+
+        <div className="max-w-md mx-auto space-y-2">
+          <div className="flex gap-2">
+            <Input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKeyState(e.target.value)}
+              placeholder="Enter your Spoonacular API key"
+              className="flex-1"
+            />
+            <Button onClick={handleApiKeySubmit}>Save Key</Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Get your API key from{" "}
+            <a
+              href="https://spoonacular.com/food-api"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-primary"
+            >
+              Spoonacular
+            </a>
           </p>
         </div>
 
